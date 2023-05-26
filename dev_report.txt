@@ -4,4 +4,4 @@
 Started: 25/05/2023
 ---19:37pm---
 * Started to study the principles of the Selenium's API.
-    The only language we are going to use is Python (with the Selenium API)
+    The only language we are going to use is Python (with the Selenium)
