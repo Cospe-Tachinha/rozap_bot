@@ -6,6 +6,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.service import Service
 from webdriver_manager.firefox import GeckoDriverManager
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException
 
 #Configuring Firefox browser options
 driver = Service(GeckoDriverManager().install())
@@ -22,15 +25,7 @@ browser.set_window_size(1000, 700)
 input("Faça a autenticação no WhatsApp Web e pressione Enter para continuar...")
 sleep(1)
 
-#Opening Chat GPT
-browser.execute_script("window.open()")
-browser.switch_to.window(browser.window_handles[1])
-browser.get("https://chat.openai.com/?model=text-davinci-002-render-sha")
-browser.switch_to.window(browser.window_handles[0])
-
-name_chat = input("Insira o nome do chat: ")
-response = input("Insira a message a ser enviada: ")
-command = "/test"
+name_chat = 'Cospe Tachinha'
 
 #Open the chat
 chat = browser.find_element(By.XPATH, f"//span[@title='{name_chat}']")
@@ -39,17 +34,20 @@ sleep(2)
 
 #Receive and send messages
 while True:
-    messages = browser.find_elements(By.CSS_SELECTOR, ".selectable-text")
+    mensagens = browser.find_elements(By.CSS_SELECTOR, ".message-in, .message-out")
 
-    for i in range(len(messages)):
-        messages = browser.find_elements(By.CSS_SELECTOR, ".selectable-text")
-        message = messages[i]
-        received_message = message.text.lower()
-        print("message recebida:", received_message)
+    ultima_mensagem = None
+    for mensagem in reversed(mensagens):
+        if mensagem.get_attribute("class").startswith("message-out"):
+            WebDriverWait(browser, 10).until(EC.visibility_of(mensagem))
+            try:
+                ultima_mensagem = mensagem.find_element(By.CSS_SELECTOR, ".selectable-text")
+                break
+            except NoSuchElementException:
+                continue
 
-        if received_message == command:
-            for letter in response:
-                field = browser.find_element(By.CSS_SELECTOR, 'div[title="Mensagem"]')
-                field.send_keys(letter)
-            field.send_keys(Keys.ENTER)
+    texto_ultima_mensagem = ultima_mensagem.text if ultima_mensagem else ""
+    if texto_ultima_mensagem:
+        print("Última mensagem enviada:", texto_ultima_mensagem)
+
     sleep(2)
