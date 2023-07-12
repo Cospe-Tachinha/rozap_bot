@@ -8,7 +8,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver import FirefoxOptions
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.service import Service
-from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.firefox import GeckoDriverManager
 from selenium.common.exceptions import NoSuchElementException
@@ -34,14 +33,20 @@ def open_gpt(browser):
     browser.switch_to.window(browser.window_handles[0])
 
 def open_chat(browser):
-    name_chat = input("Insira o nome do chat: ")
+    while True:
+        try:
+            name_chat = input("Insira o nome do chat: ")
 
-    chat = browser.find_element(By.XPATH, f"//span[@title='{name_chat}']")
-    chat.click()
-    sleep(2)
+            chat = browser.find_element(By.XPATH, f"//span[@title='{name_chat}']")
+            chat.click()
+            sleep(2)
 
-    initial_message = 'Opaa! Eu sou o RoZAP\nEnvie */help* para ver os comandos'
-    send_message(browser, initial_message)
+            initial_message = 'Opaa! Eu sou o RoZAP\nEnvie */help* para ver os comandos'
+            send_message(browser, initial_message)
+            break
+        except NoSuchElementException:
+            print("Digite um nome válido e que esteja aparecendo na tela")
+            continue
 
 def send_message(browser, message):
     text_box = browser.find_element(By.CSS_SELECTOR, 'div[title="Mensagem"]')
